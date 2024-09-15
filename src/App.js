@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useRef } from 'react';
+import CollaborativeWhiteboard from './components/CollaborativeWhiteboard';
+import Chat from './components/Chat';
 
-function App() {
+const App = () => {
+  const [ws, setWs] = useState(null);
+  const userIdRef = useRef(Math.random().toString(36).substr(2, 9));
+
+  useEffect(() => {
+    const socket = new WebSocket('ws://localhost:8080');
+    setWs(socket);
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="flex h-screen">
+      <div className="flex-grow">
+        <h1 className="text-2xl font-bold m-4">Collaborative Whiteboard</h1>
+        <CollaborativeWhiteboard ws={ws} userId={userIdRef.current} />
+        
+      </div>
+      <Chat ws={ws} userId={userIdRef.current} />
     </div>
   );
-}
+};
 
 export default App;
